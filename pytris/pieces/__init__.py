@@ -23,15 +23,19 @@ class Piece:
             color = utils.get_color(self.id)
             pygame.draw.rect(screen, color, mino)
 
-    def draw_ghost(self, screen):
+    def draw_ghost(self, screen, matrix):
         temp_origin = self.origin
-        while True:
-            temp_origin = utils.add_coordinates(temp_origin, (0, -1))
-            for cell self.shapes[self.orientation]:
+        reached_bottom = False
+        while not reached_bottom:
+            for cell in self.shapes[self.orientation]:
                 if not matrix.is_free(utils.add_coordinates(temp_origin, cell)):
-                    break
+                    reached_bottom = True
+            if reached_bottom:
+                temp_origin = utils.add_coordinates(temp_origin, (0, 1)) # this is stupid and hacky
+                break
+            temp_origin = utils.add_coordinates(temp_origin, (0, -1))
         for offset in self.shapes[self.orientation]:
-            mino = utils.make_mino(temp_origin)
+            mino = utils.make_mino(utils.add_coordinates(temp_origin, offset))
             color = (244, 244, 244)
             pygame.draw.rect(screen, color, mino)
 

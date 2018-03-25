@@ -17,7 +17,7 @@ game_over = False
 
 while not game_over:
     for event in pygame.event.get():
-        if event.type == pygame.QUIT:
+        if event.type == pygame.QUIT or event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
             game_over = True
         if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
             current_piece.hard_drop(board)
@@ -36,6 +36,6 @@ while not game_over:
 
     screen.fill((0, 0, 0))
     current_piece.draw(screen)
-    current_piece.draw_ghost(screen)
+    current_piece.draw_ghost(screen, board)
     board.draw(screen)
     pygame.display.flip()
