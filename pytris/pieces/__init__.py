@@ -5,7 +5,6 @@ from pytris.const import *
 
 class Piece:
     def __init__(self):
-        self.scale = 4
         self.origin = (4, 1)
         self.orientation = 0
 
