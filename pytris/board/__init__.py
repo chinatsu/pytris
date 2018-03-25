@@ -1,15 +1,39 @@
 import pygame
-from pytris.const import SCALE
+from pytris.const import SCALE, WIDTH, HEIGHT
 from pytris import utils
 
 class Board:
     def __init__(self):
-        self.matrix = [[0 for x in range(10)] for y in range(22)]
+        self.matrix = [['x' for x in range(WIDTH)] for y in range(HEIGHT)]
 
     def draw(self, screen):
         for y, _ in enumerate(self.matrix):
             for x, b in enumerate(self.matrix[y]):
-                mino = utils.make_mino((y, x), (0, 0), SCALE)
+                mino = utils.make_mino((x, y))
                 color = utils.get_color(b)
                 if color:
                     pygame.draw.rect(screen, color, mino)
+
+    def commit(self, piece):
+        for cell in piece.shapes[piece.orientation]:
+            absolute = utils.add_coordinates(piece.origin, cell)
+            self.matrix[absolute[1]][absolute[0]] = piece.id
+        self.clear_lines()
+        piece.new()
+
+    def clear_lines(self):
+        for idx, row in reversed(list(enumerate(self.matrix))):
+            if not 'x' in row:
+                del self.matrix[idx]
+                self.matrix.append(['x'] * WIDTH)
+
+
+    def is_free(self, coordinate):
+        if coordinate[1] >= HEIGHT or coordinate[1] < 0:
+            return False
+        elif coordinate[0] >= WIDTH or coordinate[0] < 0:
+            return False
+        elif self.matrix[coordinate[1]][coordinate[0]] != 'x':
+            return False
+        else:
+            return True

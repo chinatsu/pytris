@@ -1,3 +1,5 @@
+HEIGHT = 22
+WIDTH = 10
 SCALE = 32
 COLORS = {
         "i": (45, 254, 254),

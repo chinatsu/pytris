@@ -1,12 +1,13 @@
 from pygame import Rect
-from pytris.const import COLORS
+from pytris.const import COLORS, HEIGHT, SCALE
 
-def make_mino(origin, offset, scale):
+def make_mino(coordinate):
+    coords = to_pygame(coordinate)
     return Rect(
-        (origin[0]+offset[0])*scale,
-        (origin[1]+offset[1])*scale,
-        scale,
-        scale
+        (coords[0])*SCALE,
+        (coords[1]-1)*SCALE, # off by one error? :(
+        SCALE,
+        SCALE
     )
 
 def get_color(id):
@@ -14,3 +15,10 @@ def get_color(id):
         return False
     else:
         return COLORS[id]
+
+def to_pygame(coords):
+    """Convert coordinates into pygame coordinates (lower-left => top left)."""
+    return (coords[0], HEIGHT - coords[1])
+
+def add_coordinates(a, b):
+    return tuple(map(sum, zip(a, b)))
