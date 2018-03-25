@@ -14,6 +14,9 @@ class Piece:
             color = utils.get_color(self.id)
             pygame.draw.rect(screen, color, mino)
 
+    def rotate(self, amount):
+        self.orientation = (self.orientation + amount) % 4
+
 class I(Piece):
     def __init__(self):
         super(I, self).__init__()
