@@ -5,6 +5,7 @@ import pieces
 import board
 import sys
 from pytris.const import *
+from pytris import utils
 import random
 
 class Game:
@@ -24,6 +25,7 @@ while not game.game_over:
             game.game_over = True
         if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
             game.piece.hard_drop(game.board)
+            print(list(reversed([x.__name__ for x in game.piece.randomizer.pile])))
         if event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT:
             game.piece.move((-1, 0), game.board)
         if event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT:
@@ -38,6 +40,14 @@ while not game.game_over:
             game.piece.rotate(2, game.board)
 
     game.screen.fill((0, 0, 0))
+    coords = utils.to_pygame((3, 21))
+    bounding = pygame.Rect(
+        (coords[0])*SCALE,
+        (coords[1]-1)*SCALE, # off by one error? :(
+        3*SCALE,
+        3*SCALE
+    )
+    pygame.draw.rect(game.screen, (55, 55, 55), bounding)
     game.board.draw(game.screen)
     game.piece.draw_ghost(game.screen, game.board)
     game.piece.draw(game.screen)
