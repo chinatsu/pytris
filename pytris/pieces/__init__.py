@@ -1,6 +1,7 @@
 import pygame
 from pytris import utils
 from pytris.const import *
+from pytris.randomizer import bag
 import random
 
 
@@ -8,12 +9,12 @@ class Piece:
     def __init__(self):
         self.origin = (4, 20)
         self.orientation = 0
+        self.randomizer = bag.Randomizer()
 
     def new(self):
-        pieces = [T, S, J, L, Z, I, O]
         self.origin = (4, 20)
         self.orientation = 0
-        new_piece = random.choice(pieces)()
+        new_piece = self.randomizer.next()()
         self.shapes = new_piece.shapes
         self.id = new_piece.id
 
@@ -23,12 +24,12 @@ class Piece:
             color = utils.get_color(self.id)
             pygame.draw.rect(screen, color, mino)
 
-    def draw_ghost(self, screen, matrix):
+    def draw_ghost(self, screen, board):
         temp_origin = self.origin
         reached_bottom = False
         while not reached_bottom:
             for cell in self.shapes[self.orientation]:
-                if not matrix.is_free(utils.add_coordinates(temp_origin, cell)):
+                if not board.is_free(utils.add_coordinates(temp_origin, cell)):
                     reached_bottom = True
             if reached_bottom:
                 temp_origin = utils.add_coordinates(temp_origin, (0, 1)) # this is stupid and hacky
@@ -39,22 +40,35 @@ class Piece:
             color = (244, 244, 244)
             pygame.draw.rect(screen, color, mino)
 
-    def rotate(self, amount):
-        self.orientation = (self.orientation + amount) % 4
+    def rotate(self, amount, board):
+        for check in CHECKS:
+            new_orientation = (self.orientation + amount) % 4
+            new_origin = utils.add_coordinates(self.origin, check)
+            if self.valid_position(new_origin, new_orientation, board):
+                self.orientation = new_orientation
+                self.origin = new_origin
+                return
 
-    def move(self, offset, matrix):
-        if self.can_move(offset, matrix):
+
+
+    def move(self, offset, board):
+        if self.valid_position(utils.add_coordinates(self.origin, offset), self.orientation, board):
             self.origin = utils.add_coordinates(self.origin, offset)
 
-    def hard_drop(self, matrix):
-        while self.can_move((0, -1), matrix):
+    def hard_drop(self, board):
+        while self.valid_position(utils.add_coordinates(self.origin, (0, -1)), self.orientation, board):
             self.origin = utils.add_coordinates(self.origin, (0, -1))
-        matrix.commit(self)
+        board.commit(self)
 
-    def can_move(self, offset, matrix):
-        temp_origin = utils.add_coordinates(self.origin, offset)
-        for cell in self.shapes[self.orientation]:
-            if not matrix.is_free(utils.add_coordinates(temp_origin, cell)):
+
+    def valid_position(self, point, orientation, board):
+        for cell in self.shapes[orientation]:
+            coordinate = utils.add_coordinates(point, cell)
+            if coordinate[1] >= HEIGHT or coordinate[1] < 0:
+                return False
+            elif coordinate[0] >= WIDTH or coordinate[0] < 0:
+                return False
+            elif board.matrix[coordinate[1]][coordinate[0]] != 'x':
                 return False
         return True
 
