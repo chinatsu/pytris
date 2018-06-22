@@ -1,18 +1,34 @@
 import pygame
 from pytris import utils
 from pytris.const import *
-from pytris.randomizer import bag
 import random
-
+import math
 
 class Piece:
     def __init__(self):
-        self.origin = (4, 20)
+        self.origin = (math.floor(WIDTH/2)-1, HEIGHT-2)
+        print(self.origin)
         self.orientation = 0
+        self.das = 0
+        self.das_limit = DAS_LIMIT
         self.randomizer = bag.Randomizer()
 
+
+    def set_randomizer(self, randomizer):
+        self.randomizer = randomizer
+
+    def charge_das(self):
+        if self.das < self.das_limit:
+            self.das += 1
+        if self.das == self.das_limit:
+            return True
+        else: return False
+
+    def reset_das(self):
+        self.das = 0
+
     def new(self):
-        self.origin = (4, 20)
+        self.origin = (math.floor(WIDTH/2)-1, HEIGHT-2)
         self.orientation = 0
         new_piece = self.randomizer.next()()
         self.shapes = new_piece.shapes
@@ -37,7 +53,7 @@ class Piece:
             temp_origin = utils.add_coordinates(temp_origin, (0, -1))
         for offset in self.shapes[self.orientation]:
             mino = utils.make_mino(utils.add_coordinates(temp_origin, offset))
-            color = (244, 244, 244)
+            color = (100, 100, 100)
             pygame.draw.rect(screen, color, mino)
 
     def rotate(self, amount, board):
@@ -51,14 +67,13 @@ class Piece:
 
 
 
-    def move(self, offset, board):
+    def move(self, offset, board, ignore_das=False):
         if self.valid_position(utils.add_coordinates(self.origin, offset), self.orientation, board):
             self.origin = utils.add_coordinates(self.origin, offset)
 
     def hard_drop(self, board):
         while self.valid_position(utils.add_coordinates(self.origin, (0, -1)), self.orientation, board):
             self.origin = utils.add_coordinates(self.origin, (0, -1))
-        board.commit(self)
 
 
     def valid_position(self, point, orientation, board):
@@ -88,10 +103,10 @@ class Z(Piece):
     def __init__(self):
         super(Z, self).__init__()
         self.shapes = [
-            [(-1, 0), (0, 0), (0, 1), (1, 1)],
-            [(0, -1), (0, 0), (-1, 0), (-1, 1)],
-            [(-1, -1), (0, -1), (0, 0), (1, 0)],
-            [(1, -1), (1, 0), (0, 0), (0, 1)]
+            [(-1, 1), (0, 1), (0, 0), (1, 0)],
+            [(-1, -1), (-1, 0), (0, 0), (0, 1)],
+            [(-1, 0), (0, 0), (0, -1), (1, -1)],
+            [(0, -1), (0, 0), (1, 0), (1, 1)]
         ]
         self.id = "z"
 
@@ -111,10 +126,11 @@ class S(Piece):
     def __init__(self):
         super(S, self).__init__()
         self.shapes = [
-            [(-1, 1), (0, 1), (0, 0), (1, 0)],
-            [(-1, -1), (-1, 0), (0, 0), (0, 1)],
-            [(-1, 0), (0, 0), (0, -1), (1, -1)],
-            [(0, -1), (0, 0), (1, 0), (1, 1)]
+            [(-1, 0), (0, 0), (0, 1), (1, 1)],
+            [(0, -1), (0, 0), (-1, 0), (-1, 1)],
+            [(-1, -1), (0, -1), (0, 0), (1, 0)],
+            [(1, -1), (1, 0), (0, 0), (0, 1)]
+
         ]
         self.id = "s"
 
@@ -146,3 +162,5 @@ class T(Piece):
             [(0, 1), (0, 0), (0, -1), (1, 0)]
         ]
         self.id = "t"
+
+from pytris.randomizer import bag

@@ -1,6 +1,7 @@
-HEIGHT = 22
-WIDTH = 10
-SCALE = 32
+HEIGHT = 30
+WIDTH = 120
+SCALE = 16
+DAS_LIMIT = 6
 COLORS = {
         "i": (45, 254, 254),
         "o": (255, 253, 56),

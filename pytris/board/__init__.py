@@ -18,14 +18,17 @@ class Board:
         for cell in piece.shapes[piece.orientation]:
             absolute = utils.add_coordinates(piece.origin, cell)
             self.matrix[absolute[1]][absolute[0]] = piece.id
-        self.clear_lines()
         piece.new()
+        return self.clear_lines()
 
     def clear_lines(self):
+        cleared = 0
         for idx, row in reversed(list(enumerate(self.matrix))):
             if not 'x' in row:
+                cleared += 1
                 del self.matrix[idx]
                 self.matrix.append(['x'] * WIDTH)
+        return cleared
 
 
     def is_free(self, coordinate):
